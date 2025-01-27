@@ -18,7 +18,11 @@ struct ContentView: View {
     ]
     
     @State private var showingCreateRadioView = false  // Pour afficher CreateRadioView
-    
+    private var categories: [String] {
+        // Extraire les catégories uniques existantes
+        Array(Set(radios.map { $0.category })).sorted()
+    }
+
     var body: some View {
         NavigationView {
             List {
@@ -42,11 +46,14 @@ struct ContentView: View {
                     .font(.title)
             })
             .sheet(isPresented: $showingCreateRadioView) {
-                CreateRadioView(radio: Radio(name: "", category: "", url: ""), onSave: { name, category, url in
-                    let newRadio = Radio(name: name, category: category, url: url)
-                    radios.append(newRadio)  // Ajoute la radio à la liste
-                    showingCreateRadioView = false  // Ferme la vue de création
-                })
+                CreateRadioView(
+                    existingCategories: categories,
+                    onSave: { name, category, url in
+                        let newRadio = Radio(name: name, category: category, url: url)
+                        radios.append(newRadio)  // Ajoute la radio à la liste
+                        showingCreateRadioView = false  // Ferme la vue de création
+                    }
+                )
             }
         }
     }
